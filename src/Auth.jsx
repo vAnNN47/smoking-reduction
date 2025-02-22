@@ -1,4 +1,5 @@
-// Auth.jsx
+//Auth.jsx
+
 import React, { useState } from "react";
 import {
   getAuth,
@@ -6,8 +7,10 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { firebaseApp } from "./firebase-config";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,18 +21,29 @@ function Auth() {
   const handleAuth = async (e) => {
     e.preventDefault();
     setError("");
-    if (isLogin) {
-      try {
+    try {
+      if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
-      } catch (err) {
-        setError(err.message);
+      } else {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        // Store user data in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          createdAt: new Date(),
+          quitDate: null,
+          currentStep: "Month 1: Awareness & Small Habit Changes",
+          streaks: 0,
+          lastLoggedCigarette: null,
+        });
       }
-    } else {
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } catch (err) {
-        setError(err.message);
-      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 
