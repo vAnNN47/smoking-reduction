@@ -12,12 +12,20 @@ function UsernamePrompt({ user, db, onUsernameSet }) {
       const userRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(userRef);
       if (docSnap.exists() && docSnap.data().username) {
-        onUsernameSet(); // If username exists, allow app access
+        onUsernameSet(docSnap.data().username); // If username exists, set it immediately
       }
       setLoading(false);
     };
     checkUsername();
   }, [user, db, onUsernameSet]);
+
+  const handleUsernameSubmit = async (e) => {
+    e.preventDefault();
+    if (!username.trim()) return;
+    const userRef = doc(db, "users", user.uid);
+    await updateDoc(userRef, { username });
+    onUsernameSet(username); // Redirect to dashboard after setting username
+  };
 
   if (loading) {
     return (
@@ -55,14 +63,6 @@ function UsernamePrompt({ user, db, onUsernameSet }) {
       </div>
     );
   }
-
-  const handleUsernameSubmit = async (e) => {
-    e.preventDefault();
-    if (!username.trim()) return;
-    const userRef = doc(db, "users", user.uid);
-    await updateDoc(userRef, { username });
-    onUsernameSet(); // Allow access after setting username
-  };
 
   return (
     <div

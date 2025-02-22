@@ -1,11 +1,12 @@
 // App.jsx
 import React, { useState, useEffect } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseApp } from "../firebase/firebase-config";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import UsernamePrompt from "../components/Dashboard/UsernamePrompt";
 import Dashboard from "../components/Dashboard/Dashboard";
 import Auth from "../components/Auth";
+import Navbar from "../components/Navbar";
 
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
@@ -72,16 +73,15 @@ function App() {
   }
 
   if (!username) {
-    return (
-      <UsernamePrompt
-        user={user}
-        db={db}
-        onUsernameSet={() => setUsername(user.username)}
-      />
-    );
+    return <UsernamePrompt user={user} db={db} onUsernameSet={setUsername} />;
   }
 
-  return <Dashboard user={user} db={db} username={username} />;
+  return (
+    <div>
+      <Navbar username={username} />
+      <Dashboard user={user} db={db} username={username} />
+    </div>
+  );
 }
 
 export default App;

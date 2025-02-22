@@ -64,7 +64,6 @@ function Dashboard({ user, db, username }) {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1>Welcome, {username}</h1>
       <UserInfo user={user} db={db} />
       <SmokingHistory user={user} db={db} />
       <LogCigaretteForm user={user} db={db} />
